@@ -3,6 +3,7 @@ const { getTopics } = require("./controllers/topics.controllers");
 const app = express();
 const { getApis } = require("./controllers/api.controllers");
 const { getArticleById } = require("./controllers/article-id.controllers");
+const { getArticles } = require("./controllers/articles.controllers");
 
 app.get("/api", getApis);
 
@@ -10,11 +11,11 @@ app.get("/api/topics", getTopics);
 
 app.get("/api/articles/:article_id", getArticleById)
 
+app.get("/api/articles", getArticles);
+
 app.all("*", (request, response, next) => {
   response.status(404).send({ msg: "End point not found" });
 });
-
-
 
 app.use((error, request, response, next) => {
   if (error.code === "22P02"){
