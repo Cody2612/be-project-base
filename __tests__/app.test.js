@@ -6,10 +6,12 @@ const data = require("../db/data/test-data");
 const endpoints = require("../endpoints.json");
 
 beforeEach(() => {
-  return seed(data);
+  return seed(data)
 });
+
 afterAll(() => {
-  return db.end();
+  
+  return db.end()
 });
 
 
@@ -33,8 +35,8 @@ describe("General error handling", () => {
         .then(({ body }) => {
             expect(body.msg).toBe("End point not found");
         });
+    });
 });
- 
   
 describe("/api/topics", () => {
     test("GET:200 - responds with all topics", () => {
@@ -49,7 +51,51 @@ describe("/api/topics", () => {
             expect(typeof topic.slug).toBe("string");
           });
         });
-    });
-    
+    });   
+});
+
+describe("/api/articles/:article_id", () => {
+  test("GET:200 - responds with the article matching the article id", () => {
+    return request(app)
+      .get("/api/articles/4")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.article).toMatchObject({
+          author: expect.any(String),
+          title: expect.any(String),
+          article_id: 4,
+          body: expect.any(String),
+          topic: expect.any(String),
+          created_at: expect.any(String),
+          votes: expect.any(Number),
+          article_img_url: expect.any(String),
+        });
+      });
+  });
+
+  test("GET:404 - responds with 'Article not found' for a non-existent article ID", () => {
+    const inexistentId = 999;
+    return request(app)
+      .get(`/api/articles/${inexistentId}`)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Article not found");
+      });
+  });
+
+  test("GET:400 - responds with 'Invalid Id type' for an invalid article ID", () => {
+    return request(app)
+      .get(`/api/articles/invalidId`)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid Id type");
+      });
   });
 });
+
+  
+  
+
+  
+
+
