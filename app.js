@@ -3,9 +3,7 @@ const { getTopics } = require("./controllers/topics.controllers");
 const app = express();
 const endpoints = require("./endpoints.json");
 
-app.get("/api", (request, response) =>{
-    response.status(200).send({endpoints});
-})
+app.get("/api", getApis);
 
 app.get("/api/topics", getTopics);
 

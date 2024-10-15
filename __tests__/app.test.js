@@ -25,7 +25,7 @@ describe("/api", ()=>{
     })
 })
 
-describe("/api/anything", () => {
+describe("General error handling", () => {
     test("GET: 404 - responds with msg: End point not found", () => {
         return request(app)
         .get("/anything")
