@@ -4,7 +4,7 @@ const db = require("../db/connection.js");
 const seed = require("../db/seeds/seed.js");
 const data = require("../db/data/test-data");
 const endpoints = require("../endpoints.json");
-
+require("jest-sorted");
 
 beforeEach(() => {
   return seed(data)
@@ -117,4 +117,23 @@ describe('/api/articles', () => {
   });
 });
 
-
+describe("/api/articles/:article_id/comments", () => {
+  test("GET:200 - responds with all the comments matching the passed article id in a descending order", () => {
+    return request(app)
+      .get("/api/articles/4/comments")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments).toBeSortedBy("created_at", { descending: true });
+        body.comments.forEach((comment) =>{
+          expect(comment).toMatchObject({
+              comment_id: expect.any(Number),
+              body: expect.any(String),
+              article_id: 4,
+              author: expect.any(String),
+              votes: expect.any(Number),
+              created_at: expect.any(String)
+            })
+          })
+      });
+  });
+});
