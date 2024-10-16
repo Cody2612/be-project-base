@@ -117,7 +117,7 @@ describe('/api/articles', () => {
   });
 });
 
-describe("/api/articles/:article_id/comments", () => {
+describe("GET - /api/articles/:article_id/comments", () => {
   test("GET:200 - responds with all the comments matching the passed article id in a descending order", () => {
     return request(app)
       .get("/api/articles/4/comments")
@@ -135,5 +135,95 @@ describe("/api/articles/:article_id/comments", () => {
             })
           })
       });
-  });
+  }); 
 });
+
+describe("POST - /api/articles/:article_id/comments",()=>{
+  test("POST:201 - creates a comment for an article and responds with it", () => {
+  const testComment ={
+    username: "butter_bridge",
+    body: "Hmm, I'm so bad I don't care anymore",
+  };
+  return request(app)
+    .post("/api/articles/4/comments")
+    .send(testComment)
+    .expect(201)
+    .then(({ body }) => {
+      expect(body.comment).toMatchObject({
+        comment_id: expect.any(Number),
+        body: "Hmm, I'm so bad I don't care anymore",
+        article_id: 4,
+        author: "butter_bridge",
+        votes: expect.any(Number),
+        created_at: expect.any(String)
+      });
+    });
+  });
+
+  test("POST:201 - ignore unnecessary properties when creating a comment",()=> {
+    const testComment ={
+      username: "butter_bridge",
+      body: "Hmm, I'm so bad I don't care anymore",
+      hat: "Useless thing here"
+    };
+    return request(app)
+      .post("/api/articles/4/comments")
+      .send(testComment)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.comment).toMatchObject({
+          comment_id: expect.any(Number),
+          body: "Hmm, I'm so bad I don't care anymore",
+          article_id: 4,
+          author: "butter_bridge",
+          votes: expect.any(Number),
+          created_at: expect.any(String)
+        });
+      });
+  })
+  
+  test("POST:400 - Invalid Id",()=> {
+    const testComment ={
+      username: "butter_bridge",
+      body: "Hmm, I'm so bad I don't care anymore",
+    };
+    return request(app)
+      .post("/api/articles/invalid_id/comments")
+      .send(testComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid Id type");
+    });
+  })
+  
+  test("POST:400 - Missing required fields - username, body or both",()=> {
+    const testComment ={
+      body: "Hmm, I'm so bad I don't care anymore"
+    };
+    return request(app)
+      .post("/api/articles/4/comments")
+      .send(testComment)
+      .expect(400)
+      .then(({ body }) => {
+          expect(body.msg).toBe("Missing required fields");
+    });
+  });
+ 
+  
+  test("POST:404 - article id doesn't exist",()=> {
+    const testComment ={
+      username: "butter_bridge",
+      body: "Hmm, I'm so bad I don't care anymore",
+    };
+    return request(app)
+      .post("/api/articles/6666/comments")
+      .send(testComment)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Article not found");
+        });
+  });
+  
+});
+    
+
