@@ -5,6 +5,9 @@ const { getApis } = require("./controllers/api.controllers");
 const { getArticleById } = require("./controllers/article-id.controllers");
 const { getArticles } = require("./controllers/articles.controllers");
 const { getCommentsByArticleId } = require("./controllers/comments.controllers");
+const { postCommentsByArticleId } = require("./controllers/post-comments.controllers");
+
+app.use(express.json());
 
 app.get("/api", getApis);
 
@@ -16,6 +19,8 @@ app.get("/api/articles", getArticles);
 
 app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
 
+app.post("/api/articles/:article_id/comments", postCommentsByArticleId);
+
 app.all("*", (request, response, next) => {
   response.status(404).send({ msg: "End point not found" });
 });
@@ -23,6 +28,9 @@ app.all("*", (request, response, next) => {
 app.use((error, request, response, next) => {
   if (error.code === "22P02"){
     response.status(400).send({msg: "Invalid Id type"})
+  }
+  if (error.code === "23503") {
+    response.status(400).send({msg: "Invalid data type"})
   }
   next(error);
 });
