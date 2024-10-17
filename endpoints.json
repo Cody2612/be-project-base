@@ -82,5 +82,10 @@
           "article_img_url": "https://images.pexels.com/photos/4974912/pexels-photo-4974912.jpeg?w=700&h=700"
 	    }
     }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "deletes a comment by the comment_id",
+    "queries": ["comment_id"],
+    "exampleResponse": {}
   }
 }
