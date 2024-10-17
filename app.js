@@ -6,6 +6,7 @@ const { getArticleById } = require("./controllers/article-id.controllers");
 const { getArticles } = require("./controllers/articles.controllers");
 const { getCommentsByArticleId } = require("./controllers/comments.controllers");
 const { postCommentsByArticleId } = require("./controllers/post-comments.controllers");
+const { patchArticleByID } = require("./controllers/patch-articles-votes.controller");
 
 app.use(express.json());
 
@@ -20,6 +21,8 @@ app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
 
 app.post("/api/articles/:article_id/comments", postCommentsByArticleId);
+
+app.patch("/api/articles/:article_id", patchArticleByID);
 
 app.all("*", (request, response, next) => {
   response.status(404).send({ msg: "End point not found" });
