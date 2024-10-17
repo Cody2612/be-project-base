@@ -282,6 +282,93 @@ describe ("PATCH /api/articles/:article_id", () => {
         });
   })
 })
+describe ("PATCH /api/articles/:article_id", () => {
+  test("PATCH:200 - successful increment of votes on the selected article", () => {
+    const updatedVotes = { inc_votes : 4}
+
+    return request(app)
+    .patch("/api/articles/4")
+    .send(updatedVotes)
+    .expect(200)
+    .then(({body}) =>{
+      expect(body.article).toMatchObject({
+        author: expect.any(String),
+        title: expect.any(String),
+        article_id: 4,
+        body: expect.any(String),
+        topic: expect.any(String),
+        created_at: expect.any(String),
+        votes: 4,
+        article_img_url: expect.any(String),
+      })
+    })
+  })
+  
+  test("PATCH:400 - Invalid Id", () => {
+    const updatedVotes = { inc_votes : 4}
+
+    return request(app)
+    .patch("/api/articles/invalid_id")
+    .send(updatedVotes)
+    .expect(400)
+    .then(({body}) =>{
+      expect(body.msg).toBe("Invalid Id type");
+    })
+  })
+  
+  test("PATCH:400 - Missing required field - e.g. inc_votes",()=> {
+
+    return request(app)
+      .patch("/api/articles/4")
+      .send({})
+      .expect(400)
+      .then(({ body }) => {
+          expect(body.msg).toBe("Missing required fields");
+    });
+  });
+
+  test("PATCH:404 - valid article id but doesn't exist", () => {
+    const updatedVotes = { inc_votes: 4}
+    return request(app)
+      .patch("/api/articles/6666")
+      .send(updatedVotes)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Article not found");
+        });
+  })
+})
+
+describe("DELETE /api/comments/:comment_id",()=>{
+  test("DELETE:204 - successfully deleting comments by the comment_id", ()=>{
+    return request(app)
+    .delete("/api/comments/4")
+    .expect(204);
+  })
+  
+  test("DELETE:400 - Invalid Id type", ()=>{
+    return request(app)
+    .delete("/api/comments/invalid_id")
+    .expect(400)
+    .then(({body}) =>{
+      expect(body.msg).toBe("Invalid Id type");
+    })
+  });
+
+  test("DELETE:404 - valid comment id but doesn't exist", ()=>{
+    return request(app)
+    .delete("/api/comments/6666")
+    .expect(404)
+    .then(({body}) => {
+      expect(body.msg).toBe("Article not found");
+    })
+  });
+});
+
+
+
+  
+
 
 
     
