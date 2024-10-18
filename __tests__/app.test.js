@@ -119,16 +119,79 @@ describe('/api/articles', () => {
         expect(body.articles).toHaveLength(13);
 
         body.articles.forEach(article => {
-          expect(Object.keys(article).length).toBeGreaterThan(0); 
-          expect(typeof article.author).toBe('string');
-          expect(typeof article.title).toBe('string');
-          expect(typeof article.article_id).toBe('number');
-          expect(typeof article.topic).toBe('string');
-          expect(typeof article.created_at).toBe('string');
-          expect(typeof article.votes).toBe('number');
-          expect(typeof article.article_img_url).toBe('string');
-          expect(typeof article.comment_count).toBe('string');
+          expect(article).toMatchObject({
+            author: expect.any(String),
+            title: expect.any(String),
+            article_id: expect.any(Number),
+            topic: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(Number)
+          });
         });
+      });
+  });
+  
+  test('GET:200 - responds with all the articles sorted by the default value of created_at in a descending manner', () => {
+    return request(app)
+      .get('/api/articles')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy('created_at', { descending: true });
+        expect(body.articles).toHaveLength(13);
+
+        body.articles.forEach(article => {
+          expect(article).toMatchObject({
+            author: expect.any(String),
+            title: expect.any(String),
+            article_id: expect.any(Number),
+            topic: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(Number)
+          });
+        });
+      });
+  });
+  
+  test('GET:200 - responds with all the articles sorted by a different value e.g author in an ascending manner', () => {
+    return request(app)
+      .get('/api/articles?sort_by=author&&order=ASC')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy('author', { ascending: true });
+        expect(body.articles).toHaveLength(13);
+
+        body.articles.forEach(article => {
+          expect(article).toMatchObject({
+            author: expect.any(String),
+            title: expect.any(String),
+            article_id: expect.any(Number),
+            topic: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(Number)
+          });
+        });
+      });
+  });
+  test('GET:400 - responds with Invalid sort query if invoked with an invalid query e.g password', () => {
+    return request(app)
+      .get('/api/articles?sort_by=invalid_query=password')
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid sort query")
+      });
+  });
+  test('GET:400 - responds with Invalid order by query if invoked with an invalid query e.g order by password', () => {
+    return request(app)
+      .get('/api/articles?order=invalid_order_by=password')
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid order query")
       });
   });
 });
