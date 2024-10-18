@@ -178,6 +178,41 @@ describe('/api/articles', () => {
         });
       });
   });
+  
+  test('GET:200 - responds with a descending list sorted by votes in a descending manner with a topic of mitch', () => {
+    return request(app)
+      .get('/api/articles?topic=mitch&sort_by=created_at&order=DESC')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy("created_at", {descending: true});
+        body.articles.forEach(article =>{
+          expect(article.topic).toBe("mitch");
+        })
+      });
+  });
+  
+  test('GET:200 - responds with an empty array when there are no articles for the specific topic', () => {
+    return request(app)
+      .get('/api/articles?topic=pinguin')
+      .expect(200)
+      .then(({ body }) => {
+        body.articles.forEach(article =>{
+          expect(article.articles).toEqual([]);
+        })
+      });
+  });
+  
+  test('GET:200 - responds with all the articles sorted by the provided topic', () => {
+    return request(app)
+      .get('/api/articles?topic=mitch')
+      .expect(200)
+      .then(({ body }) => {
+        body.articles.forEach(article =>{
+          expect(article.topic).toBe("mitch");
+        })
+      });
+  });
+  
   test('GET:400 - responds with Invalid sort query if invoked with an invalid query e.g password', () => {
     return request(app)
       .get('/api/articles?sort_by=invalid_query=password')
@@ -186,6 +221,7 @@ describe('/api/articles', () => {
         expect(body.msg).toBe("Invalid sort query")
       });
   });
+  
   test('GET:400 - responds with Invalid order by query if invoked with an invalid query e.g order by password', () => {
     return request(app)
       .get('/api/articles?order=invalid_order_by=password')
