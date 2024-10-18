@@ -1,7 +1,7 @@
 const db = require("../db/connection.js");
 
 
-exports.fetchArticles = (sort_by ="created_at", order="DESC") =>{
+exports.fetchArticles = (sort_by ="created_at", order="DESC", topic) =>{
     const sortBy = [
         "author",
         "title",
@@ -36,13 +36,19 @@ exports.fetchArticles = (sort_by ="created_at", order="DESC") =>{
         CAST(COUNT(comments.article_id) AS INT) AS comment_count
     FROM articles
     LEFT JOIN comments
-    ON articles.article_id = comments.article_id
-    GROUP BY articles.article_id 
-    ORDER BY ${sort_by} ${order} ;`;
+    ON articles.article_id = comments.article_id `;
 
-    return db.query(queryString)
-    .then(({rows}) => {
-        return rows;
-    });
+    const queryValues = [];
+
+    if(topic){
+        queryString += `WHERE articles.topic = $1 `;
+        queryValues.push(topic);
+    };
+
+    queryString += `GROUP BY articles.article_id 
+    ORDER BY ${sort_by} ${order} `;
+    
+    return db.query(queryString, queryValues)
+    .then(({rows}) => rows);
 
 };
