@@ -215,7 +215,7 @@ describe('/api/articles', () => {
   
   test('GET:400 - responds with Invalid sort query if invoked with an invalid query e.g password', () => {
     return request(app)
-      .get('/api/articles?sort_by=invalid_query=password')
+      .get('/api/articles?sort_by=invalid_query')
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe("Invalid sort query")
@@ -224,13 +224,14 @@ describe('/api/articles', () => {
   
   test('GET:400 - responds with Invalid order by query if invoked with an invalid query e.g order by password', () => {
     return request(app)
-      .get('/api/articles?order=invalid_order_by=password')
+      .get('/api/articles?order=invalid_order_by')
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe("Invalid order query")
       });
   });
 });
+
 
 describe("GET - /api/articles/:article_id/comments", () => {
   test("GET:200 - responds with all the comments matching the passed article id in a descending order", () => {
